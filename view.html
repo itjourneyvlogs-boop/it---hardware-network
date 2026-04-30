@@ -44,6 +44,14 @@
         background: #00bcd4;
         color: white;
     }
+    .action-btn {
+        padding: 6px 12px;
+        margin: 3px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+    }
     </style>
 </head>
 
@@ -56,7 +64,7 @@
     <button class="delete" onclick="deleteAllPending()">🗑 అన్ని పెండింగ్ తీసేయి</button>
 </div>
 
-<h2>⏳ అన్ని పెండింగ్ వర్క్స్ (ఆటో అప్‌డేట్)</h2>
+<h2>⏳ అన్ని పెండింగ్ వర్క్స్ (Date Edit సపోర్ట్)</h2>
 
 <table id="dataTable">
 <thead>
@@ -80,15 +88,25 @@ function loadAllPending() {
     allPending = [];
     const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER"];
 
-    // 1. General Works
+    // General Works
     let general = JSON.parse(localStorage.getItem("works")) || [];
     general.forEach((item, idx) => {
         if (item.status === "Pending") {
-            allPending.push({type: "Work", block: item.block || "-", date: item.date, item: item.problem || "-", person: item.dept || "-", status: "Pending", source: "works", index: idx});
+            allPending.push({
+                type: "Work", 
+                block: item.block || "-", 
+                date: item.date, 
+                item: item.problem || "-", 
+                person: item.dept || "-", 
+                status: "Pending", 
+                source: "works", 
+                index: idx,
+                isDateTime: false
+            });
         }
     });
 
-    // 2. Block Works, Indents & Gatepasses
+    // Block Works, Indents & Gatepasses
     blocks.forEach(block => {
         const clean = block.replace(/\s+/g, "_");
 
@@ -96,7 +114,17 @@ function loadAllPending() {
         let bworks = JSON.parse(localStorage.getItem("works_" + clean)) || [];
         bworks.forEach((item, idx) => {
             if (item.status === "Pending") {
-                allPending.push({type: "Block", block: block, date: item.date, item: item.problem || "-", person: item.dept || "-", status: "Pending", source: "works_" + clean, index: idx});
+                allPending.push({
+                    type: "Block Work", 
+                    block: block, 
+                    date: item.date, 
+                    item: item.problem || "-", 
+                    person: item.dept || "-", 
+                    status: "Pending", 
+                    source: "works_" + clean, 
+                    index: idx,
+                    isDateTime: false
+                });
             }
         });
 
@@ -104,7 +132,17 @@ function loadAllPending() {
         let indents = JSON.parse(localStorage.getItem("indents_" + clean)) || [];
         indents.forEach((item, idx) => {
             if (item.status === "Pending") {
-                allPending.push({type: "Indent", block: block, date: item.date, item: item.material || "-", person: item.personName || "-", status: "Pending", source: "indents_" + clean, index: idx});
+                allPending.push({
+                    type: "Indent", 
+                    block: block, 
+                    date: item.date, 
+                    item: item.material || "-", 
+                    person: item.personName || "-", 
+                    status: "Pending", 
+                    source: "indents_" + clean, 
+                    index: idx,
+                    isDateTime: false
+                });
             }
         });
 
@@ -112,7 +150,17 @@ function loadAllPending() {
         let gates = JSON.parse(localStorage.getItem("gatepass_" + clean)) || [];
         gates.forEach((item, idx) => {
             if (item.status === "Pending") {
-                allPending.push({type: "Gatepass", block: block, date: item.dateTime ? item.dateTime.split("T")[0] : "-", item: item.purpose || "-", person: item.personName || "-", status: "Pending", source: "gatepass_" + clean, index: idx});
+                allPending.push({
+                    type: "Gatepass", 
+                    block: block, 
+                    date: item.dateTime ? item.dateTime.split("T")[0] : "-", 
+                    item: item.purpose || "-", 
+                    person: item.personName || "-", 
+                    status: "Pending", 
+                    source: "gatepass_" + clean, 
+                    index: idx,
+                    isDateTime: true   // Gatepass కి DateTime ఉంటుంది
+                });
             }
         });
     });
@@ -139,44 +187,58 @@ function renderTable() {
             <td>${item.person}</td>
             <td><strong>${item.status}</strong></td>
             <td>
-                <button style="background:#2196F3; color:white; padding:6px 12px; border:none; border-radius:4px; margin-right:5px;" 
-                        onclick="editStatus(${i})">✏️ స్టేటస్ మార్చు</button>
-                <button style="background:#f44336; color:white; padding:6px 12px; border:none; border-radius:4px;" 
-                        onclick="deleteItem(${i})">🗑 తీసేయి</button>
+                <button class="action-btn" style="background:#2196F3; color:white;" 
+                        onclick="editItem(${i})">✏️ Edit</button>
+                <button class="action-btn" style="background:#f44336; color:white;" 
+                        onclick="deleteItem(${i})">🗑 Delete</button>
             </td>
         </tr>`;
     });
 }
 
-// ================= STATUS EDIT + AUTO REMOVE =================
-function editStatus(i) {
+// ================= MAIN EDIT FUNCTION (Date + Status) =================
+function editItem(i) {
     const p = allPending[i];
-    let newStatus = prompt(`ప్రస్తుత స్టేటస్: ${p.status}\n\nకొత్త స్టేటస్ ఎంటర్ చేయండి:\n\nPending\nIn Progress\nCompleted\nApproved\nIssued\nReturned`, p.status);
+    let currentDate = p.date || "";
+
+    let newDate = prompt(`ప్రస్తుత తేదీ: ${currentDate}\n\nకొత్త తేదీ ఎంటర్ చేయండి (YYYY-MM-DD):`, currentDate);
+    if (newDate === null) return;
+
+    let newStatus = prompt(`ప్రస్తుత స్టేటస్: ${p.status}\n\nకొత్త స్టేటస్ ఎంటర్ చేయండి:\nPending, In Progress, Completed, Approved, Issued, Returned`, p.status);
 
     if (!newStatus) return;
     newStatus = newStatus.trim();
 
     const validStatuses = ["Pending", "In Progress", "Completed", "Approved", "Issued", "Returned"];
     if (!validStatuses.includes(newStatus)) {
-        alert("Invalid Status! సరైన స్టేటస్ ఎంటర్ చేయండి.");
+        alert("Invalid Status!");
         return;
     }
 
-    // Original dataలో స్టేటస్ అప్‌డేట్ చేయి
+    // Original dataలో అప్‌డేట్ చేయి
     let dataArray = JSON.parse(localStorage.getItem(p.source)) || [];
+    
     if (dataArray[p.index]) {
+        // Date Update
+        if (p.isDateTime) {
+            // Gatepass కి DateTime ఫీల్డ్
+            let dt = dataArray[p.index].dateTime || "";
+            if (dt) {
+                const timePart = dt.split("T")[1] || "00:00";
+                dataArray[p.index].dateTime = newDate + "T" + timePart;
+            }
+        } else {
+            dataArray[p.index].date = newDate;
+        }
+
+        // Status Update
         dataArray[p.index].status = newStatus;
+
         localStorage.setItem(p.source, JSON.stringify(dataArray));
     }
 
-    alert(`✅ స్టేటస్ "${newStatus}"కి మార్చబడింది!`);
-
-    // Completed అయితే Pending లిస్ట్ నుండి ఆటోమాటిక్‌గా తీసేయి
-    if (newStatus !== "Pending") {
-        loadAllPending();   // Refresh చేస్తే Pending లిస్ట్ నుండి తీసేయబడుతుంది
-    } else {
-        renderTable();      // Pendingగా ఉంటే మాత్రమే టేబుల్ రీఫ్రెష్
-    }
+    alert(`✅ తేదీ మరియు స్టేటస్ అప్‌డేట్ చేయబడింది!`);
+    loadAllPending();   // Refresh the list
 }
 
 function deleteItem(i) {
@@ -189,16 +251,15 @@ function deleteItem(i) {
     }
 }
 
+// Delete All Pending (మిగతా కోడ్ అదే ఉంచాను)
 function deleteAllPending() {
-    if (confirm("అన్ని పెండింగ్ వర్క్స్ తీసేయాలా? ఈ చర్య వెనక్కి తీసుకోలేము!")) {
+    if (confirm("అన్ని పెండింగ్ వర్క్స్ తీసేయాలా?")) {
         const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER"];
 
-        // General Works
         let works = JSON.parse(localStorage.getItem("works")) || [];
         works = works.filter(x => x.status !== "Pending");
         localStorage.setItem("works", JSON.stringify(works));
 
-        // Block wise
         blocks.forEach(b => {
             const c = b.replace(/\s+/g, "_");
             ["works_", "indents_", "gatepass_"].forEach(prefix => {
@@ -213,7 +274,7 @@ function deleteAllPending() {
     }
 }
 
-function exportExcel() {
+function exportExcel() { /* మీ పాత కోడ్ ఉంచవచ్చు */ 
     if (allPending.length === 0) return alert("డేటా లేదు!");
     let csv = "టైపు,బ్లాక్,తేదీ,ఐటెం,వ్యక్తి,స్టేటస్\n";
     allPending.forEach(item => {
