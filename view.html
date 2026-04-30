@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>పెండింగ్ వర్క్స్</title>
+    <title>పెండింగ్ వర్క్స్ - Raised & Completed Date</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
@@ -39,6 +39,7 @@
         border: 1px solid #666;
         padding: 10px;
         text-align: center;
+        vertical-align: middle;
     }
     th {
         background: #00bcd4;
@@ -52,6 +53,7 @@
         cursor: pointer;
         font-size: 13px;
     }
+    .completed { color: #4CAF50; font-weight: bold; }
     </style>
 </head>
 
@@ -64,14 +66,15 @@
     <button class="delete" onclick="deleteAllPending()">🗑 అన్ని పెండింగ్ తీసేయి</button>
 </div>
 
-<h2>⏳ అన్ని పెండింగ్ వర్క్స్ (Date Edit సపోర్ట్)</h2>
+<h2>⏳ Pending Works - Raised Date & Completed Date</h2>
 
 <table id="dataTable">
 <thead>
 <tr>
     <th>టైపు</th>
     <th>బ్లాక్</th>
-    <th>తేదీ</th>
+    <th>Raised Date</th>
+    <th>Completed Date</th>
     <th>సమస్య / మెటీరియల్</th>
     <th>వ్యక్తి / డిపార్ట్‌మెంట్</th>
     <th>స్టేటస్</th>
@@ -93,20 +96,20 @@ function loadAllPending() {
     general.forEach((item, idx) => {
         if (item.status === "Pending") {
             allPending.push({
-                type: "Work", 
-                block: item.block || "-", 
-                date: item.date, 
-                item: item.problem || "-", 
-                person: item.dept || "-", 
-                status: "Pending", 
-                source: "works", 
+                type: "Work",
+                block: item.block || "-",
+                raisedDate: item.date || "-",
+                completedDate: item.completedDate || "-",
+                item: item.problem || "-",
+                person: item.dept || "-",
+                status: item.status,
+                source: "works",
                 index: idx,
                 isDateTime: false
             });
         }
     });
 
-    // Block Works, Indents & Gatepasses
     blocks.forEach(block => {
         const clean = block.replace(/\s+/g, "_");
 
@@ -115,13 +118,14 @@ function loadAllPending() {
         bworks.forEach((item, idx) => {
             if (item.status === "Pending") {
                 allPending.push({
-                    type: "Block Work", 
-                    block: block, 
-                    date: item.date, 
-                    item: item.problem || "-", 
-                    person: item.dept || "-", 
-                    status: "Pending", 
-                    source: "works_" + clean, 
+                    type: "Block Work",
+                    block: block,
+                    raisedDate: item.date || "-",
+                    completedDate: item.completedDate || "-",
+                    item: item.problem || "-",
+                    person: item.dept || "-",
+                    status: item.status,
+                    source: "works_" + clean,
                     index: idx,
                     isDateTime: false
                 });
@@ -133,13 +137,14 @@ function loadAllPending() {
         indents.forEach((item, idx) => {
             if (item.status === "Pending") {
                 allPending.push({
-                    type: "Indent", 
-                    block: block, 
-                    date: item.date, 
-                    item: item.material || "-", 
-                    person: item.personName || "-", 
-                    status: "Pending", 
-                    source: "indents_" + clean, 
+                    type: "Indent",
+                    block: block,
+                    raisedDate: item.date || "-",
+                    completedDate: item.completedDate || "-",
+                    item: item.material || "-",
+                    person: item.personName || "-",
+                    status: item.status,
+                    source: "indents_" + clean,
                     index: idx,
                     isDateTime: false
                 });
@@ -151,15 +156,16 @@ function loadAllPending() {
         gates.forEach((item, idx) => {
             if (item.status === "Pending") {
                 allPending.push({
-                    type: "Gatepass", 
-                    block: block, 
-                    date: item.dateTime ? item.dateTime.split("T")[0] : "-", 
-                    item: item.purpose || "-", 
-                    person: item.personName || "-", 
-                    status: "Pending", 
-                    source: "gatepass_" + clean, 
+                    type: "Gatepass",
+                    block: block,
+                    raisedDate: item.dateTime ? item.dateTime.split("T")[0] : "-",
+                    completedDate: item.completedDate || "-",
+                    item: item.purpose || "-",
+                    person: item.personName || "-",
+                    status: item.status,
+                    source: "gatepass_" + clean,
                     index: idx,
-                    isDateTime: true   // Gatepass కి DateTime ఉంటుంది
+                    isDateTime: true
                 });
             }
         });
@@ -173,7 +179,7 @@ function renderTable() {
     tbody.innerHTML = "";
 
     if (allPending.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="padding:30px; color:#d32f2f;">పెండింగ్ వర్క్స్ లేవు</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="padding:30px; color:#d32f2f;">పెండింగ్ వర్క్స్ లేవు</td></tr>`;
         return;
     }
 
@@ -182,13 +188,14 @@ function renderTable() {
         <tr>
             <td><strong>${item.type}</strong></td>
             <td>${item.block}</td>
-            <td>${item.date || '-'}</td>
+            <td>${item.raisedDate}</td>
+            <td class="completed">${item.completedDate || '-'}</td>
             <td style="text-align:left;">${item.item}</td>
             <td>${item.person}</td>
             <td><strong>${item.status}</strong></td>
             <td>
                 <button class="action-btn" style="background:#2196F3; color:white;" 
-                        onclick="editItem(${i})">✏️ Edit</button>
+                        onclick="editItem(${i})">✏️ Edit (Date & Status)</button>
                 <button class="action-btn" style="background:#f44336; color:white;" 
                         onclick="deleteItem(${i})">🗑 Delete</button>
             </td>
@@ -196,49 +203,53 @@ function renderTable() {
     });
 }
 
-// ================= MAIN EDIT FUNCTION (Date + Status) =================
+// ================= EDIT RAISED DATE + COMPLETED DATE + STATUS =================
 function editItem(i) {
     const p = allPending[i];
-    let currentDate = p.date || "";
 
-    let newDate = prompt(`ప్రస్తుత తేదీ: ${currentDate}\n\nకొత్త తేదీ ఎంటర్ చేయండి (YYYY-MM-DD):`, currentDate);
-    if (newDate === null) return;
+    let newRaised = prompt(`Raised Date (ప్రస్తుతం: ${p.raisedDate})\nకొత్త Raised Date (YYYY-MM-DD):`, p.raisedDate);
+    if (newRaised === null) return;
 
-    let newStatus = prompt(`ప్రస్తుత స్టేటస్: ${p.status}\n\nకొత్త స్టేటస్ ఎంటర్ చేయండి:\nPending, In Progress, Completed, Approved, Issued, Returned`, p.status);
+    let newCompleted = prompt(`Completed Date (ఎప్పుడు పూర్తి అయింది?)\nYYYY-MM-DD ఎంటర్ చేయండి (లేదా ఖాళీగా వదలండి):`, p.completedDate || "");
+
+    let newStatus = prompt(`స్టేటస్ (ప్రస్తుతం: ${p.status})\nకొత్త స్టేటస్:`, p.status);
 
     if (!newStatus) return;
     newStatus = newStatus.trim();
 
     const validStatuses = ["Pending", "In Progress", "Completed", "Approved", "Issued", "Returned"];
     if (!validStatuses.includes(newStatus)) {
-        alert("Invalid Status!");
+        alert("Invalid Status! సరైన స్టేటస్ ఎంటర్ చేయండి.");
         return;
     }
 
-    // Original dataలో అప్‌డేట్ చేయి
+    // Update in localStorage
     let dataArray = JSON.parse(localStorage.getItem(p.source)) || [];
-    
     if (dataArray[p.index]) {
-        // Date Update
+        const record = dataArray[p.index];
+
+        // Raised Date Update
         if (p.isDateTime) {
-            // Gatepass కి DateTime ఫీల్డ్
-            let dt = dataArray[p.index].dateTime || "";
-            if (dt) {
-                const timePart = dt.split("T")[1] || "00:00";
-                dataArray[p.index].dateTime = newDate + "T" + timePart;
+            let dt = record.dateTime || "";
+            if (dt && newRaised) {
+                const timePart = dt.includes("T") ? dt.split("T")[1] : "00:00";
+                record.dateTime = newRaised + "T" + timePart;
             }
         } else {
-            dataArray[p.index].date = newDate;
+            if (newRaised) record.date = newRaised;
         }
 
-        // Status Update
-        dataArray[p.index].status = newStatus;
+        // Completed Date
+        record.completedDate = newCompleted || "";
+
+        // Status
+        record.status = newStatus;
 
         localStorage.setItem(p.source, JSON.stringify(dataArray));
     }
 
-    alert(`✅ తేదీ మరియు స్టేటస్ అప్‌డేట్ చేయబడింది!`);
-    loadAllPending();   // Refresh the list
+    alert("✅ Raised Date, Completed Date & Status అప్‌డేట్ చేయబడ్డాయి!");
+    loadAllPending();
 }
 
 function deleteItem(i) {
@@ -251,7 +262,6 @@ function deleteItem(i) {
     }
 }
 
-// Delete All Pending (మిగతా కోడ్ అదే ఉంచాను)
 function deleteAllPending() {
     if (confirm("అన్ని పెండింగ్ వర్క్స్ తీసేయాలా?")) {
         const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER"];
@@ -274,17 +284,17 @@ function deleteAllPending() {
     }
 }
 
-function exportExcel() { /* మీ పాత కోడ్ ఉంచవచ్చు */ 
+function exportExcel() {
     if (allPending.length === 0) return alert("డేటా లేదు!");
-    let csv = "టైపు,బ్లాక్,తేదీ,ఐటెం,వ్యక్తి,స్టేటస్\n";
+    let csv = "టైపు,బ్లాక్,Raised Date,Completed Date,ఐటెం,వ్యక్తి,స్టేటస్\n";
     allPending.forEach(item => {
-        csv += `"${item.type}","${item.block}","${item.date || ''}","${item.item.replace(/"/g,'""')}","${item.person}","${item.status}"\n`;
+        csv += `"${item.type}","${item.block}","${item.raisedDate}","${item.completedDate || ''}","${item.item.replace(/"/g,'""')}","${item.person}","${item.status}"\n`;
     });
 
     const blob = new Blob([csv], { type: "text/csv" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "Pending_Works.csv";
+    link.download = "Pending_Works_With_Dates.csv";
     link.click();
 }
 
