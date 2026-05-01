@@ -58,6 +58,13 @@
         max-width: 350px;
         white-space: pre-wrap;
     }
+    td.editable {
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    td.editable:hover {
+        background: #e3f2fd;
+    }
     .file-item {
         cursor: pointer;
         padding: 8px 12px;
@@ -161,11 +168,11 @@ function renderTable(data, isPending = false) {
             `).join('');
         }
 
-        tbody.innerHTML += `
-        <tr>
+        const row = document.createElement("tr");
+        row.innerHTML = `
             <td><strong>${item.indentNo || ''}</strong></td>
             <td>${item.date || ''}</td>
-            <td>${item.receivedDate || '-'}</td>
+            <td class="editable" data-field="receivedDate" data-index="${originalIndex}">${item.receivedDate || '-'}</td>
             <td>${item.personName || '-'}</td>
             <td class="material-cell">${item.material || ''}</td>
             <td>${item.quantity || ''}</td>
@@ -173,16 +180,64 @@ function renderTable(data, isPending = false) {
             <td>${item.deptFloor || ''}</td>
             <td class="purpose-cell">${item.purpose || '-'}</td>
             <td class="files-cell">${filesHTML}</td>
-            <td><strong>${item.status || ''}</strong></td>
+            <td><strong>${item.status || 'Pending'}</strong></td>
             <td>
                 <button class="action-btn edit-btn" onclick="editStatus(${originalIndex})">Edit Status</button>
                 <button class="action-btn delete-btn" onclick="deleteRow(${originalIndex})">Delete</button>
             </td>
-        </tr>`;
-    });
-};
+        `;
 
-// Open Attachment (Base64)
+        // Make Received Date editable
+        row.querySelectorAll('.editable').forEach(cell => {
+            cell.addEventListener('click', () => makeEditable(cell));
+        });
+
+        tbody.appendChild(row);
+    });
+}
+
+// ✅ NEW INLINE EDIT FUNCTION - Received Date ki Auto Current Time
+function makeEditable(cell) {
+    const field = cell.getAttribute('data-field');
+    const index = parseInt(cell.getAttribute('data-index'));
+    let currentVal = cell.innerText.trim() === '-' ? '' : cell.innerText.trim();
+
+    if (field === "receivedDate") {
+        const input = document.createElement("input");
+        input.type = "datetime-local";
+        
+        // Auto set current local time if empty
+        if (!currentVal || currentVal === '-') {
+            const now = new Date();
+            input.value = now.toISOString().slice(0, 16);
+        } else {
+            input.value = currentVal;
+        }
+
+        cell.innerHTML = "";
+        cell.appendChild(input);
+        input.focus();
+
+        input.onblur = () => saveEdit(index, field, input.value, cell);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === "Enter") {
+                saveEdit(index, field, input.value, cell);
+            }
+        });
+    }
+}
+
+function saveEdit(index, field, newValue, cell) {
+    if (newValue === "") newValue = "-";
+    allData[index][field] = newValue;
+    saveData();
+
+    cell.innerHTML = newValue || '-';
+    cell.style.background = "#d4edda";
+    setTimeout(() => { cell.style.background = ""; }, 700);
+}
+
+// Open Attachment
 function openAttachment(itemIndex, fileIndex) {
     const item = allData[itemIndex];
     if (!item || !item.attachedFiles || !item.attachedFiles[fileIndex]) {
@@ -191,7 +246,6 @@ function openAttachment(itemIndex, fileIndex) {
     }
 
     const file = item.attachedFiles[fileIndex];
-    
     try {
         const byteString = atob(file.data.split(',')[1]);
         const mimeString = file.data.split(',')[0].split(':')[1].split(';')[0];
@@ -203,9 +257,7 @@ function openAttachment(itemIndex, fileIndex) {
         }
 
         const blob = new Blob([ab], { type: mimeString });
-        const url = URL.createObjectURL(blob);
-        
-        window.open(url, '_blank');
+        window.open(URL.createObjectURL(blob), '_blank');
     } catch (err) {
         alert("Unable to open this file.");
     }
