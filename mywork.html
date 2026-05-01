@@ -9,42 +9,44 @@
         background: #f4f6f9;
         padding: 20px;
     }
-    h2 { text-align: center; }
+    h2 { text-align: center; color: #1e3c72; }
 
     .form-box {
         max-width: 800px;
         margin: auto;
         background: white;
-        padding: 25px;
-        border-radius: 10px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.15);
     }
 
     label {
         display: block;
-        margin: 12px 0 5px 0;
+        margin: 12px 0 6px 0;
         font-weight: bold;
+        color: #333;
     }
 
     input, select, textarea {
         width: 100%;
-        padding: 10px;
-        margin-bottom: 10px;
-        border-radius: 5px;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 6px;
         border: 1px solid #ccc;
         box-sizing: border-box;
+        font-size: 16px;
     }
 
     button {
         background: #00bcd4;
         color: white;
         border: none;
-        padding: 12px;
+        padding: 14px;
         width: 100%;
-        border-radius: 5px;
+        border-radius: 8px;
         cursor: pointer;
-        margin-top: 15px;
-        font-size: 16px;
+        font-size: 18px;
+        margin-top: 10px;
     }
 
     .back-btn {
@@ -55,7 +57,11 @@
         border-radius: 8px;
         cursor: pointer;
         font-size: 16px;
-        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    select {
+        background: white;
     }
     </style>
 </head>
@@ -66,7 +72,7 @@
 
 <div style="text-align: center; margin-bottom: 20px;">
     <button onclick="goBackToMenu()" class="back-btn">
-        ⬅ Back to Menu (Dashboard)
+        ⬅ Back to Dashboard
     </button>
 </div>
 
@@ -83,8 +89,23 @@
     <label>Time</label>
     <input type="time" id="time" required>
 
-    <label>Block Name</label>
-    <input type="text" id="block" readonly style="background:#f0f0f0; font-weight:bold;">
+    <!-- BLOCK NAME AS DROPDOWN -->
+    <label>Block Name <span style="color:red;">*</span></label>
+    <select id="block" required>
+        <option value="">-- Select Block --</option>
+        <option value="NGH">NGH</option>
+        <option value="NSSH">NSSH</option>
+        <option value="NNC">NNC</option>
+        <option value="OPD BLOCK">OPD BLOCK</option>
+        <option value="NMC">NMC</option>
+        <option value="NDC">NDC</option>
+        <option value="NPC">NPC</option>
+        <option value="CAMP OFFICE">CAMP OFFICE</option>
+        <option value="SITE OFFICE">SITE OFFICE</option>
+        <option value="BOYS HOSTEL">BOYS HOSTEL</option>
+        <option value="GIRLS HOSTEL">GIRLS HOSTEL</option>
+        <option value="OTHER">OTHER</option>
+    </select>
 
     <label>Department Name</label>
     <input type="text" id="dept">
@@ -93,7 +114,7 @@
     <input type="text" id="floor">
 
     <label>Problem</label>
-    <textarea id="problem" rows="3"></textarea>
+    <textarea id="problem" rows="3" placeholder="Describe the problem..."></textarea>
 
     <label>Refer Ticket Number</label>
     <input type="text" id="ticket">
@@ -105,7 +126,7 @@
         <option value="Completed">Completed</option>
     </select>
 
-    <!-- Pending Reason Field -->
+    <!-- Pending Reason -->
     <label id="pendingReasonLabel" style="color: #d32f2f; display: none;">Pending Reason (ఎందుకు Pending ఉంది?)</label>
     <textarea id="pendingReason" rows="3" style="display: none;" 
               placeholder="Enter reason why the work is pending..."></textarea>
@@ -118,41 +139,28 @@
 
 <script>
 
-// Block Name Auto Fill from URL
-function getBlockFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("block");
-}
+// All Blocks List (same as other files)
+const blocks = [
+    "NGH", "NSSH", "NNC", "OPD BLOCK", "NMC", "NDC", "NPC", 
+    "CAMP OFFICE", "SITE OFFICE", "BOYS HOSTEL", "GIRLS HOSTEL", "OTHER"
+];
 
-// Page Load
-window.onload = function() {
-    // Block Auto Fill
-    const blockName = getBlockFromURL();
-    if (blockName) {
-        document.getElementById("block").value = blockName;
-    } else {
-        document.getElementById("block").removeAttribute("readonly");
-        document.getElementById("block").style.background = "white";
-    }
-
-    // Status Change Event - Pending Reason Show/Hide
-    const statusField = document.getElementById("status");
+// Status change handler for Pending Reason
+document.getElementById("status").addEventListener("change", function() {
     const reasonLabel = document.getElementById("pendingReasonLabel");
     const reasonField = document.getElementById("pendingReason");
 
-    statusField.addEventListener("change", function() {
-        if (this.value === "Pending") {
-            reasonLabel.style.display = "block";
-            reasonField.style.display = "block";
-        } else {
-            reasonLabel.style.display = "none";
-            reasonField.style.display = "none";
-            reasonField.value = "";
-        }
-    });
-};
+    if (this.value === "Pending") {
+        reasonLabel.style.display = "block";
+        reasonField.style.display = "block";
+    } else {
+        reasonLabel.style.display = "none";
+        reasonField.style.display = "none";
+        reasonField.value = "";
+    }
+});
 
-// ================= SAVE DATA =================
+// Save Form
 document.getElementById("workForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -170,7 +178,7 @@ document.getElementById("workForm").addEventListener("submit", function(e) {
     };
 
     if (!formData.block) {
-        alert("Block Name తప్పనిసరి!");
+        alert("Please select a Block Name!");
         return;
     }
 
@@ -181,15 +189,13 @@ document.getElementById("workForm").addEventListener("submit", function(e) {
 
     localStorage.setItem(blockKey, JSON.stringify(oldData));
 
-    alert("✅ Saved Successfully!");
+    alert("✅ Work Entry Saved Successfully!");
 
+    // Reset form
     this.reset();
-
-    // Reset Block Name
-    const currentBlock = getBlockFromURL();
-    if (currentBlock) {
-        document.getElementById("block").value = currentBlock;
-    }
+    
+    // Reset block to "Select Block" 
+    document.getElementById("block").value = "";
 });
 
 function goBackToMenu() {
