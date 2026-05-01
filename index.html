@@ -2,79 +2,138 @@
 <html>
 <head>
     <title>Secure Login - IT Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-    body {
+    * {
         margin: 0;
         padding: 0;
-        font-family: Arial, sans-serif;
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
         height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
         color: white;
+        overflow: hidden;
         position: relative;
     }
+
+    /* Background Image - నీ ఫైల్ నుండి వస్తుంది */
     body::before {
         content: "";
         position: absolute;
         top: 0; left: 0;
         width: 100%; height: 100%;
         background: url('bg.jpg') no-repeat center center/cover;
-        opacity: 0.7;
+        opacity: 0.85;
         z-index: -1;
     }
+
     .login-box {
-        background: rgba(0,0,0,0.8);
-        padding: 40px 35px;
-        border-radius: 15px;
-        width: 360px;
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(12px);
+        padding: 45px 40px;
+        border-radius: 20px;
+        width: 380px;
         text-align: center;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-        z-index: 1;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7);
+        border: 1px solid rgba(255,255,255,0.15);
+        z-index: 10;
     }
-    h2 { margin-bottom: 20px; color: #00e5ff; }
+
+    h2 {
+        color: #00e5ff;
+        margin-bottom: 10px;
+        font-size: 28px;
+    }
+
+    p {
+        color: #a0c4ff;
+        margin-bottom: 25px;
+    }
+
+    .input-group {
+        position: relative;
+        margin: 15px 0;
+    }
+
+    .input-group i {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #00e5ff;
+        font-size: 18px;
+    }
+
     input {
         width: 100%;
-        padding: 14px;
-        margin: 10px 0;
-        border: none;
-        border-radius: 8px;
+        padding: 14px 45px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        border-radius: 10px;
+        color: white;
         font-size: 16px;
     }
-    button {
-        width: 100%;
-        padding: 14px;
-        margin: 10px 0;
-        border: none;
-        border-radius: 8px;
-        font-size: 16px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-    .login-btn { background: #00bcd4; color: white; }
-    .change-btn { background: #ff9800; color: white; }
-    #msg { color: #ff6666; margin-top: 10px; font-weight: bold; min-height: 20px; }
 
-    /* CAPTCHA Style */
+    input:focus {
+        outline: none;
+        border-color: #00e5ff;
+        box-shadow: 0 0 0 3px rgba(0,229,255,0.25);
+    }
+
     .captcha-container {
         display: flex;
         align-items: center;
         gap: 10px;
-        margin: 15px 0;
+        margin: 20px 0;
     }
+
     #captchaText {
-        font-size: 22px;
+        font-size: 26px;
         font-weight: bold;
-        letter-spacing: 4px;
-        background: #fff;
-        color: #333;
-        padding: 8px 15px;
-        border-radius: 6px;
+        letter-spacing: 6px;
+        background: rgba(255,255,255,0.95);
+        color: #1e3c72;
+        padding: 10px 20px;
+        border-radius: 8px;
         user-select: none;
+        flex: 1;
     }
-    #captchaInput {
-        width: 140px;
+
+    button {
+        width: 100%;
+        padding: 14px;
+        margin: 12px 0;
+        border: none;
+        border-radius: 10px;
+        font-size: 17px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+    .login-btn {
+        background: linear-gradient(135deg, #00bcd4, #00e5ff);
+        color: white;
+    }
+
+    .login-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 188, 212, 0.5);
+    }
+
+    .change-btn {
+        background: #ff9800;
+        color: white;
+    }
+
+    #msg {
+        margin-top: 15px;
+        font-weight: bold;
+        min-height: 25px;
     }
     </style>
 </head>
@@ -84,24 +143,32 @@
     <h2>🔐 Secure Login</h2>
     <p>IT Work Management System</p>
 
-    <input type="text" id="username" placeholder="Username" value="admin"><br>
-    <input type="password" id="password" placeholder="Password"><br>
+    <div class="input-group">
+        <i class="fas fa-user"></i>
+        <input type="text" id="username" placeholder="Username" value="admin">
+    </div>
 
-    <!-- CAPTCHA -->
+    <div class="input-group">
+        <i class="fas fa-lock"></i>
+        <input type="password" id="password" placeholder="Password">
+    </div>
+
     <div class="captcha-container">
         <span id="captchaText"></span>
-        <button onclick="generateCaptcha()" style="padding:8px 12px; width:auto; background:#666;">↻</button>
+        <button onclick="generateCaptcha()" style="padding:10px 14px; width:auto; background:rgba(255,255,255,0.2); color:white; border:none; border-radius:8px;">
+            <i class="fas fa-redo"></i>
+        </button>
     </div>
-    <input type="text" id="captchaInput" placeholder="Enter CAPTCHA" maxlength="6">
+    <input type="text" id="captchaInput" placeholder="Enter CAPTCHA" maxlength="6" style="margin-bottom:20px;">
 
-    <button class="login-btn" onclick="login()">Login</button><br>
+    <button class="login-btn" onclick="login()">LOGIN</button>
     <button class="change-btn" onclick="changePassword()">Change Password</button>
 
     <p id="msg"></p>
 </div>
 
 <script>
-// Default Login Setup
+// Password Hashing
 async function hashPassword(password) {
     const msgBuffer = new TextEncoder().encode(password);
     const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
@@ -116,11 +183,9 @@ async function initializeDefault() {
         localStorage.setItem("password", hashed);
     }
 }
-initializeDefault();
 
 let currentCaptcha = "";
 
-// Generate Random CAPTCHA
 function generateCaptcha() {
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     currentCaptcha = "";
@@ -130,7 +195,6 @@ function generateCaptcha() {
     document.getElementById("captchaText").innerText = currentCaptcha;
 }
 
-// Login with CAPTCHA
 async function login() {
     const user = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value.trim();
@@ -138,10 +202,12 @@ async function login() {
     const msg = document.getElementById("msg");
 
     if (!user || !pass) {
+        msg.style.color = "#ff6666";
         msg.innerHTML = "⚠️ Username & Password required!";
         return;
     }
     if (captchaInput !== currentCaptcha) {
+        msg.style.color = "#ff6666";
         msg.innerHTML = "❌ Invalid CAPTCHA!";
         generateCaptcha();
         document.getElementById("captchaInput").value = "";
@@ -158,7 +224,7 @@ async function login() {
         msg.innerHTML = "✅ Login Successful! Redirecting...";
         setTimeout(() => {
             window.location.href = "dashboard.html";
-        }, 800);
+        }, 1000);
     } else {
         msg.style.color = "#ff6666";
         msg.innerHTML = "❌ Invalid Username or Password!";
@@ -167,7 +233,6 @@ async function login() {
     }
 }
 
-// Change Password
 async function changePassword() {
     const oldPass = prompt("Enter Current Password:");
     if (!oldPass) return;
@@ -176,7 +241,7 @@ async function changePassword() {
     const oldHash = await hashPassword(oldPass);
 
     if (oldHash === savedHash) {
-        const newPass = prompt("Enter New Password (min 6 characters):");
+        const newPass = prompt("Enter New Password (minimum 6 characters):");
         if (newPass && newPass.length >= 6) {
             const newHash = await hashPassword(newPass);
             localStorage.setItem("password", newHash);
@@ -195,8 +260,7 @@ window.onload = () => {
     generateCaptcha();
 };
 
-// Enter Key Support
-document.getElementById("captchaInput").addEventListener("keypress", (e) => {
+document.addEventListener("keypress", (e) => {
     if (e.key === "Enter") login();
 });
 </script>
