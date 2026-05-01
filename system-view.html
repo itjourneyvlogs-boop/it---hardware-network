@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Data View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+    body {
+        font-family: Arial;
+        background: #f4f6f9;
+        padding: 20px;
+        margin: 0;
+    }
+    .header {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    .top-buttons {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    button {
+        padding: 10px 18px;
+        margin: 5px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+    }
+    .back { background: #333; color: white; }
+    .excel { background: green; color: white; }
+    .print { background: #17a2b8; color: white; }
+    .delete-all { background: red; color: white; }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: center;
+        vertical-align: middle;
+        position: relative;
+    }
+    th {
+        background: #00bcd4;
+        color: white;
+    }
+    td.editable {
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    td.editable:hover {
+        background: #e3f2fd;
+    }
+    .search-box {
+        width: 350px;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        font-size: 16px;
+    }
+    .action-btn {
+        padding: 6px 12px;
+        margin: 2px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 13px;
+    }
+    .delete-btn { background: #f44336; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2 id="blockTitle">🖥️ System Data - Block Name</h2>
+</div>
+
+<div class="top-buttons">
+    <button class="back" onclick="goBackToSystemData()">⬅ Back to System Data</button>
+    <button class="back" onclick="goBackToDashboard()">⬅ Dashboard</button>
+    <button class="excel" onclick="exportToExcel()">📄 Export to Excel</button>
+    <button class="print" onclick="printPage()">🖨 Print</button>
+    <button class="delete-all" onclick="deleteAllData()">🗑 Delete All</button>
+</div>
+
+<input type="text" id="searchInput" class="search-box" 
+       placeholder="Search by Equipment Name, IP, Serial No, Make..." onkeyup="searchTable()">
+
+<table id="dataTable">
+    <thead>
+        <tr>
+            <th>S.No</th>
+            <th>Equipment Name</th>
+            <th>Make</th>
+            <th>Location</th>
+            <th>Floor</th>
+            <th>Model</th>
+            <th>RAM</th>
+            <th>Storage</th>
+            <th>IP Number</th>
+            <th>Serial Number</th>
+            <th>OS</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+// Current Block
+let currentBlock = localStorage.getItem("currentBlock") || "OTHER";
+let allData = [];
+
+document.getElementById("blockTitle").innerHTML = `🖥️ System Data - ${currentBlock}`;
+
+// Load Data
+function loadSystemData() {
+    const key = "system_" + currentBlock.replace(/\s+/g, "_");
+    const stored = localStorage.getItem(key);
+    allData = stored ? JSON.parse(stored) : [];
+    renderTable(allData);
+}
+
+// Render Table with Inline Editing
+function renderTable(data) {
+    const tbody = document.querySelector("#dataTable tbody");
+    tbody.innerHTML = "";
+
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="13" style="padding:40px; color:#666;">No records found</td></tr>`;
+        return;
+    }
+
+    data.forEach((item, index) => {
+        const originalIndex = allData.findIndex(d => d.timestamp === item.timestamp);
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td class="editable" data-field="equipmentName" data-index="${originalIndex}">${item.equipmentName || '-'}</td>
+            <td class="editable" data-field="make" data-index="${originalIndex}">${item.make || '-'}</td>
+            <td class="editable" data-field="location" data-index="${originalIndex}">${item.location || '-'}</td>
+            <td class="editable" data-field="floor" data-index="${originalIndex}">${item.floor || '-'}</td>
+            <td class="editable" data-field="model" data-index="${originalIndex}">${item.model || '-'}</td>
+            <td class="editable" data-field="ram" data-index="${originalIndex}">${item.ram || '-'}</td>
+            <td class="editable" data-field="storage" data-index="${originalIndex}">${item.storage || '-'}</td>
+            <td class="editable" data-field="ipNumber" data-index="${originalIndex}">${item.ipNumber || '-'}</td>
+            <td class="editable" data-field="serialNumber" data-index="${originalIndex}">${item.serialNumber || '-'}</td>
+            <td class="editable" data-field="os" data-index="${originalIndex}">${item.os || '-'}</td>
+            <td class="editable" data-field="status" data-index="${originalIndex}">${item.status || 'Working'}</td>
+            <td>
+                <button class="action-btn delete-btn" onclick="deleteSystem(${originalIndex})">Delete</button>
+            </td>
+        `;
+
+        // Add click event for inline editing
+        row.querySelectorAll('.editable').forEach(cell => {
+            cell.addEventListener('click', function() {
+                makeEditable(this);
+            });
+        });
+
+        tbody.appendChild(row);
+    });
+}
+
+// Make Cell Editable
+function makeEditable(cell) {
+    const originalText = cell.innerText.trim();
+    const field = cell.getAttribute('data-field');
+    const index = parseInt(cell.getAttribute('data-index'));
+
+    if (field === "status") {
+        // Dropdown for Status
+        const select = document.createElement("select");
+        ["Working", "Under Repair", "Not Working", "Decommissioned"].forEach(opt => {
+            const option = document.createElement("option");
+            option.value = opt;
+            option.text = opt;
+            if (opt === originalText) option.selected = true;
+            select.appendChild(option);
+        });
+
+        cell.innerHTML = "";
+        cell.appendChild(select);
+        select.focus();
+
+        select.addEventListener("blur", () => saveInlineEdit(index, field, select.value, cell));
+        select.addEventListener("change", () => saveInlineEdit(index, field, select.value, cell));
+    } else {
+        // Text Input for other fields
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = originalText === "-" ? "" : originalText;
+        input.style.width = "100%";
+        input.style.border = "none";
+        input.style.padding = "8px";
+        input.style.fontSize = "14px";
+
+        cell.innerHTML = "";
+        cell.appendChild(input);
+        input.focus();
+        input.select();
+
+        input.addEventListener("blur", () => saveInlineEdit(index, field, input.value.trim(), cell));
+        input.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                saveInlineEdit(index, field, input.value.trim(), cell);
+            }
+        });
+    }
+}
+
+// Save Inline Edit
+function saveInlineEdit(index, field, newValue, cell) {
+    if (newValue === "") newValue = "-";
+
+    allData[index][field] = newValue;
+    saveData();
+
+    // Refresh cell
+    cell.innerText = newValue;
+    cell.style.background = "#d4edda"; // Green flash
+    setTimeout(() => {
+        cell.style.background = "";
+    }, 800);
+}
+
+// Delete Function
+function deleteSystem(index) {
+    if (confirm("ఈ System Record తీసేయాలా?")) {
+        allData.splice(index, 1);
+        saveData();
+        renderTable(allData);
+    }
+}
+
+// Delete All
+function deleteAllData() {
+    if (confirm(`"${currentBlock}" బ్లాక్ లోని అన్ని System Data తీసేయాలా?`)) {
+        allData = [];
+        saveData();
+        renderTable(allData);
+    }
+}
+
+// Save to localStorage
+function saveData() {
+    const key = "system_" + currentBlock.replace(/\s+/g, "_");
+    localStorage.setItem(key, JSON.stringify(allData));
+}
+
+// Search
+function searchTable() {
+    const query = document.getElementById("searchInput").value.toLowerCase().trim();
+    if (!query) {
+        renderTable(allData);
+        return;
+    }
+
+    const filtered = allData.filter(item =>
+        Object.values(item).some(val => 
+            val && val.toString().toLowerCase().includes(query)
+        )
+    );
+    renderTable(filtered);
+}
+
+// Export to Excel
+function exportToExcel() {
+    if (allData.length === 0) return alert("డేటా లేదు!");
+
+    let csv = "S.No,Equipment Name,Make,Location,Floor,Model,RAM,Storage,IP Number,Serial Number,OS,Status,Remarks\n";
+    allData.forEach((d, i) => {
+        csv += `"${i+1}","${d.equipmentName || ''}","${d.make || ''}","${d.location || ''}","${d.floor || ''}","${d.model || ''}","${d.ram || ''}","${d.storage || ''}","${d.ipNumber || ''}","${d.serialNumber || ''}","${d.os || ''}","${d.status || ''}","${d.remarks || ''}"\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `${currentBlock}_System_Data.csv`;
+    link.click();
+}
+
+function printPage() { window.print(); }
+
+function goBackToSystemData() { window.location.href = "system-data.html"; }
+function goBackToDashboard() { window.location.href = "dashboard.html"; }
+
+// Initialize
+window.onload = loadSystemData;
+</script>
+
+</body>
+</html>

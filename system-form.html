@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New System / Equipment Entry</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+    body {
+        font-family: Arial;
+        background: #f4f6f9;
+        padding: 20px;
+    }
+    h2 {
+        text-align: center;
+        color: #1e3c72;
+    }
+    .form-box {
+        max-width: 950px;
+        margin: auto;
+        background: white;
+        padding: 35px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    label {
+        display: block;
+        margin: 12px 0 6px 0;
+        font-weight: bold;
+        color: #333;
+    }
+    input, select, textarea {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+    button {
+        background: #00bcd4;
+        color: white;
+        border: none;
+        padding: 14px;
+        width: 100%;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 18px;
+        margin-top: 15px;
+    }
+    .back-btn {
+        background: #333;
+        color: white;
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+    .required { color: red; }
+    </style>
+</head>
+<body>
+
+<h2>🖥️ New System / Equipment Entry</h2>
+
+<div style="text-align: center; margin-bottom: 20px;">
+    <button onclick="goBackToSystem()" class="back-btn">
+        ⬅ Back to System Data
+    </button>
+</div>
+
+<div class="form-box">
+    <form id="systemForm">
+
+        <label>Block Name <span class="required">*</span></label>
+        <select id="block" required>
+            <option value="">-- Select Block --</option>
+            <option value="NGH">NGH</option>
+            <option value="NSSH">NSSH</option>
+            <option value="NNC">NNC</option>
+            <option value="OPD BLOCK">OPD BLOCK</option>
+            <option value="NMC">NMC</option>
+            <option value="NDC">NDC</option>
+            <option value="NPC">NPC</option>
+            <option value="CAMP OFFICE">CAMP OFFICE</option>
+            <option value="SITE OFFICE">SITE OFFICE</option>
+            <option value="BOYS HOSTEL">BOYS HOSTEL</option>
+            <option value="GIRLS HOSTEL">GIRLS HOSTEL</option>
+            <option value="OTHER">OTHER</option>
+        </select>
+
+        <label>Equipment Name / Hostname <span class="required">*</span></label>
+        <input type="text" id="equipmentName" placeholder="e.g. NGH-PC-01, Server-02" required>
+
+        <label>Make / Brand</label>
+        <input type="text" id="make" placeholder="Dell, HP, Lenovo, IBM etc.">
+
+        <label>Location</label>
+        <input type="text" id="location" placeholder="e.g. Room No. 105, Nurse Station">
+
+        <label>Floor</label>
+        <input type="text" id="floor" placeholder="Ground Floor, 1st Floor, 2nd Floor">
+
+        <label>Model</label>
+        <input type="text" id="model" placeholder="e.g. OptiPlex 7080, ProLiant DL380">
+
+        <label>Configuration</label>
+        <textarea id="configuration" rows="3" placeholder="Processor, Motherboard, Graphics etc."></textarea>
+
+        <label>RAM (e.g. 16GB, 32GB)</label>
+        <input type="text" id="ram">
+
+        <label>Storage (e.g. 512GB SSD, 1TB HDD)</label>
+        <input type="text" id="storage">
+
+        <label>IP Number / Address</label>
+        <input type="text" id="ipNumber" placeholder="192.168.1.45">
+
+        <label>Serial Number</label>
+        <input type="text" id="serialNumber">
+
+        <label>Operating System (OS)</label>
+        <input type="text" id="os" placeholder="Windows 11 Pro, Windows 10, Ubuntu 22.04">
+
+        <label>Status</label>
+        <select id="status">
+            <option value="Working">Working</option>
+            <option value="Under Repair">Under Repair</option>
+            <option value="Not Working">Not Working</option>
+            <option value="Decommissioned">Decommissioned</option>
+        </select>
+
+        <label>Remarks / Notes</label>
+        <textarea id="remarks" rows="4" placeholder="Any additional information..."></textarea>
+
+        <button type="submit">💾 Save System Data</button>
+    </form>
+</div>
+
+<script>
+// Get Block from URL (if coming from system-data.html)
+function getBlockFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("block");
+}
+
+window.onload = function() {
+    const blockName = getBlockFromURL();
+    if (blockName) {
+        document.getElementById("block").value = blockName;
+    }
+};
+
+// Form Submit
+document.getElementById("systemForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const formData = {
+        equipmentName: document.getElementById("equipmentName").value.trim(),
+        make: document.getElementById("make").value.trim(),
+        location: document.getElementById("location").value.trim(),
+        floor: document.getElementById("floor").value.trim(),
+        model: document.getElementById("model").value.trim(),
+        configuration: document.getElementById("configuration").value.trim(),
+        ram: document.getElementById("ram").value.trim(),
+        storage: document.getElementById("storage").value.trim(),
+        ipNumber: document.getElementById("ipNumber").value.trim(),
+        serialNumber: document.getElementById("serialNumber").value.trim(),
+        os: document.getElementById("os").value.trim(),
+        status: document.getElementById("status").value,
+        remarks: document.getElementById("remarks").value.trim(),
+        block: document.getElementById("block").value,
+        timestamp: new Date().toISOString()
+    };
+
+    if (!formData.block || !formData.equipmentName) {
+        alert("Block Name మరియు Equipment Name తప్పనిసరి!");
+        return;
+    }
+
+    const key = "system_" + formData.block.replace(/\s+/g, "_");
+    
+    let oldData = JSON.parse(localStorage.getItem(key)) || [];
+    oldData.push(formData);
+
+    localStorage.setItem(key, JSON.stringify(oldData));
+
+    alert("✅ System / Equipment Data Saved Successfully!");
+
+    // Reset form
+    this.reset();
+    
+    // Keep selected block if coming from URL
+    const currentBlock = getBlockFromURL();
+    if (currentBlock) {
+        document.getElementById("block").value = currentBlock;
+    }
+});
+
+function goBackToSystem() {
+    window.location.href = "system-data.html";
+}
+</script>
+
+</body>
+</html>
