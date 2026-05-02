@@ -5,28 +5,71 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
     body { margin:0; font-family:Arial; background: linear-gradient(135deg, #6a11cb, #2575fc); color:white; }
-    header { text-align:center; padding:25px; font-size:26px; }
-    .container { padding:30px; }
+    header { text-align:center; padding:20px; font-size:26px; background:rgba(0,0,0,0.4); }
+    .back-btn { position:fixed; top:20px; left:20px; padding:10px 18px; background:#00bfff; color:white; border:none; border-radius:8px; cursor:pointer; }
+    .logout { position:fixed; top:20px; right:20px; padding:10px 18px; background:#e74c3c; color:white; border:none; border-radius:8px; cursor:pointer; }
+    .container { padding:80px 20px 30px; }
     table { width:100%; border-collapse:collapse; background:rgba(255,255,255,0.1); }
     th, td { padding:12px; border:1px solid rgba(255,255,255,0.3); text-align:left; }
     th { background:rgba(0,0,0,0.4); }
-    .logout { position:fixed; top:20px; right:20px; padding:10px 18px; background:#e74c3c; border:none; color:white; border-radius:8px; cursor:pointer; }
+    .edit-btn { background:#ffd700; color:black; padding:6px 12px; border:none; border-radius:5px; cursor:pointer; }
     </style>
 </head>
 <body>
-    <header>🖥️ Super Block System Data - Mr. Rafi</header>
+    <button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
     <button class="logout" onclick="logout()">Logout</button>
 
+    <header>🖥️ Super Block System Data - Mr. Rafi</header>
+
     <div class="container">
-        <table>
-            <tr><th>Serial No</th><th>Equipment</th><th>Block</th><th>IP Address</th><th>Status</th></tr>
-            <tr><td>SB-001</td><td>Server</td><td>Super Block</td><td>192.168.1.10</td><td style="color:lime;">Active</td></tr>
-            <tr><td>SB-002</td><td>Printer</td><td>Super Block</td><td>192.168.1.15</td><td style="color:orange;">Maintenance</td></tr>
+        <table id="systemTable">
+            <tr><th>Serial No</th><th>Equipment</th><th>IP Address</th><th>Status</th><th>Action</th></tr>
         </table>
     </div>
 
     <script>
-    function logout(){ if(confirm("లాగ్ అవుట్ చేయాలా?")) window.location.href="index.html"; }
+    function loadSystemData() {
+        const tbody = document.getElementById('systemTable');
+        let data = JSON.parse(localStorage.getItem('system_SUPER_BLOCK') || '[]');
+        
+        let html = `<tr><th>Serial No</th><th>Equipment</th><th>IP Address</th><th>Status</th><th>Action</th></tr>`;
+        
+        if(data.length === 0) {
+            html += `<tr><td colspan="5" style="text-align:center;">No System Data Found for Super Block</td></tr>`;
+        } else {
+            data.forEach((item, index) => {
+                html += `
+                    <tr>
+                        <td>${item.serial || 'N/A'}</td>
+                        <td>${item.equipment || 'N/A'}</td>
+                        <td>${item.ip || 'N/A'}</td>
+                        <td>${item.status || 'Active'}</td>
+                        <td><button class="edit-btn" onclick="editSystem(${index})">✏️ Edit</button></td>
+                    </tr>`;
+            });
+        }
+        tbody.innerHTML = html;
+    }
+
+    function editSystem(index) {
+        let data = JSON.parse(localStorage.getItem('system_SUPER_BLOCK') || '[]');
+        const newStatus = prompt("Update Status (Active/Maintenance):", data[index].status);
+        if(newStatus) {
+            data[index].status = newStatus;
+            localStorage.setItem('system_SUPER_BLOCK', JSON.stringify(data));
+            loadSystemData();
+        }
+    }
+
+    function goBack() { window.location.href = "dashboard.html"; }
+    function logout() {
+        if(confirm("లాగ్ అవుట్ చేయాలా?")) {
+            localStorage.removeItem("loggedIn");
+            window.location.href = "index.html";
+        }
+    }
+
+    window.onload = loadSystemData;
     </script>
 </body>
 </html>
