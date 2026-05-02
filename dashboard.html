@@ -12,14 +12,13 @@
         color: white;
         min-height: 100vh;
     }
-    header { 
-        text-align: center; 
-        padding: 25px; 
-        font-size: 28px; 
-        font-weight: bold; 
+    header {
+        text-align: center;
+        padding: 25px;
+        font-size: 28px;
+        font-weight: bold;
         background: rgba(0,0,0,0.3);
     }
-
     .tabs {
         display: flex;
         justify-content: center;
@@ -45,22 +44,19 @@
         color: #1e3c72;
         box-shadow: 0 5px 20px rgba(0,229,255,0.5);
     }
-
     .tab-content { display: none; padding: 10px 20px; }
     .tab-content.active { display: block; }
 
     .search-container { text-align: center; margin: 20px auto; max-width: 700px; }
-    #searchInput, #searchInputRafi {
+    #searchInput {
         width: 90%; max-width: 650px; padding: 16px 20px; font-size: 17px;
         border: none; border-radius: 50px; background: rgba(255,255,255,0.95);
         color: #333;
     }
-
     .chart-box {
         width: 380px; margin: 25px auto; background: rgba(255,255,255,0.12);
         padding: 25px; border-radius: 20px; backdrop-filter: blur(12px);
     }
-
     .container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -76,7 +72,6 @@
         transition: all 0.4s;
     }
     .card:hover { transform: translateY(-10px) scale(1.05); background: rgba(255,255,255,0.25); }
-
     .system-card {
         background: linear-gradient(135deg, #ff0066, #ff3399);
         box-shadow: 0 0 35px rgba(255,51,153,0.9);
@@ -84,8 +79,12 @@
     }
     @keyframes glow { from {box-shadow: 0 0 20px rgba(255,51,153,0.7);} to {box-shadow: 0 0 45px rgba(255,51,153,1);} }
 
-    .rafi-card {
-        background: linear-gradient(135deg, #6a11cb, #2575fc);
+    .coming-soon {
+        text-align: center;
+        padding: 100px 20px;
+        font-size: 32px;
+        font-weight: bold;
+        color: #ffd700;
     }
 
     .logout {
@@ -113,7 +112,7 @@
 <!-- Tabs -->
 <div class="tabs">
     <button class="tab-button active" onclick="switchTab(0)">📊 All Blocks</button>
-    <button class="tab-button" onclick="switchTab(1)">👤 Mr. Rafi Data</button>
+    <button class="tab-button" onclick="switchTab(1)">📁 Data</button>
 </div>
 
 <!-- ==================== TAB 1: ALL BLOCKS ==================== -->
@@ -143,33 +142,12 @@
     </div>
 </div>
 
-<!-- ==================== TAB 2: MR. RAFI DATA ==================== -->
+<!-- ==================== TAB 2: DATA (Coming Soon) ==================== -->
 <div id="tab1" class="tab-content">
-    <div class="search-container">
-        <input type="text" id="searchInputRafi" placeholder="🔍 Search in Mr. Rafi Data (Super Block)..." onkeyup="globalSearchRafi()">
-    </div>
-
-    <div class="container">
-        <div class="card rafi-card" onclick="openPage('Rafi My Work')">
-            <i class="fas fa-briefcase" style="color:#ffd700; font-size:55px;"></i>
-            <h3>My Work</h3>
-        </div>
-        <div class="card rafi-card" onclick="openPage('Super Block System Data')">
-            <i class="fas fa-server" style="color:#00ffcc; font-size:55px;"></i>
-            <h3>Super Block System Data</h3>
-        </div>
-        <div class="card rafi-card" onclick="openPage('Super Block Indent')">
-            <i class="fas fa-file-invoice" style="color:#ff6f61; font-size:55px;"></i>
-            <h3>Super Block Indent</h3>
-        </div>
-        <div class="card rafi-card" onclick="openPage('Super Block Gate Pass')">
-            <i class="fas fa-id-badge" style="color:#ffa500; font-size:55px;"></i>
-            <h3>Super Block Gate Pass</h3>
-        </div>
-        <div class="card rafi-card" onclick="openPage('Rafi Documents')">
-            <i class="fas fa-folder-open" style="color:#66ff99; font-size:55px;"></i>
-            <h3>Documents</h3>
-        </div>
+    <div class="coming-soon">
+        <i class="fas fa-clock" style="font-size:80px; margin-bottom:20px;"></i><br>
+        📁 Data Section<br>
+        <span style="font-size:24px; color:#aaa;">Coming Soon...</span>
     </div>
 </div>
 
@@ -197,7 +175,7 @@ function updateChart() {
 
     const chartData = {
         labels: ['Works', 'Indents', 'Gatepass', 'Systems'],
-        datasets: [{ 
+        datasets: [{
             data: [works, indents, gates, systems],
             backgroundColor: ['#00e5ff','#ff6f61','#66ff99','#ffff00']
         }]
@@ -208,8 +186,8 @@ function updateChart() {
         myChart = new Chart(document.getElementById('myChart'), {
             type: 'doughnut',
             data: chartData,
-            options: { 
-                responsive: true, 
+            options: {
+                responsive: true,
                 plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
             }
         });
@@ -239,21 +217,12 @@ function openPage(name) {
         "Documents": "my-documents.html",
         "Pending Works": "view.html",
         "Gatepass": "gatepass.html",
-        "System Data": "system-data.html",
-        
-        // Rafi Pages
-        "Rafi My Work": "rafi-mywork.html",
-        "Super Block System Data": "super-system-data.html",
-        "Super Block Indent": "super-indent.html",
-        "Super Block Gate Pass": "super-gatepass.html",
-        "Rafi Documents": "rafi-documents.html"
+        "System Data": "system-data.html"
     };
     if (pages[name]) window.location.href = pages[name];
 }
 
-// Placeholder Search Functions
-function globalSearch() { /* All Blocks Search Logic */ }
-function globalSearchRafi() { /* Rafi Search Logic */ }
+function globalSearch() { /* Search Logic */ }
 
 window.onload = () => {
     updateChart();
