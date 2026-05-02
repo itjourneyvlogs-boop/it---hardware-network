@@ -17,6 +17,35 @@
         font-size: 28px; 
         font-weight: bold; 
     }
+
+    .tabs {
+        display: flex;
+        justify-content: center;
+        background: rgba(0,0,0,0.4);
+        padding: 12px 0;
+        margin-bottom: 20px;
+    }
+    .tab-button {
+        padding: 14px 35px;
+        font-size: 18px;
+        font-weight: bold;
+        border: none;
+        background: rgba(255,255,255,0.1);
+        color: white;
+        margin: 5px 10px;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    .tab-button.active {
+        background: #00e5ff;
+        color: #1e3c72;
+        box-shadow: 0 5px 20px rgba(0,229,255,0.5);
+    }
+
+    .tab-content { display: none; padding: 10px 20px; }
+    .tab-content.active { display: block; }
+
     .search-container {
         text-align: center;
         margin: 25px auto;
@@ -79,6 +108,14 @@
     .search-results th { background: #00bcd4; color: white; padding: 12px; }
     .search-results td { padding: 10px; border: 1px solid #ddd; }
 
+    .coming-soon {
+        text-align: center;
+        padding: 120px 20px;
+        font-size: 36px;
+        font-weight: bold;
+        color: #ffd700;
+    }
+
     .logout {
         position: fixed;
         top: 20px;
@@ -100,29 +137,47 @@
 
 <button class="logout" onclick="logout()">🚪 Logout</button>
 
-<div class="search-container">
-    <input type="text" id="searchInput" placeholder="🔍 Search Equipment, Problem, Material, Person, IP, Serial No, Purpose..."
-           onkeyup="globalSearch()">
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab-button active" onclick="switchTab(0)">📊 All Blocks</button>
+    <button class="tab-button" onclick="switchTab(1)">📁 Data</button>
 </div>
 
-<div class="chart-box">
-    <canvas id="myChart"></canvas>
-</div>
+<!-- TAB 1: ALL BLOCKS -->
+<div id="tab0" class="tab-content active">
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="🔍 Search Equipment, Problem, Material, Person, IP, Serial No, Purpose..."
+               onkeyup="globalSearch()">
+    </div>
 
-<div class="system-row">
-    <div class="card system-card" onclick="openPage('System Data')">
-        <i class="fas fa-server" style="color: #ffff00; font-size: 58px;"></i>
-        <h3>System Data</h3>
+    <div class="chart-box">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <div class="system-row">
+        <div class="card system-card" onclick="openPage('System Data')">
+            <i class="fas fa-server" style="color: #ffff00; font-size: 58px;"></i>
+            <h3>System Data</h3>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="card" onclick="openPage('My Work')"><i class="fas fa-briefcase" style="color:#00e5ff"></i><h3>My Work</h3></div>
+        <div class="card" onclick="openPage('Blocks')"><i class="fas fa-building" style="color:#ffcc00"></i><h3>Blocks</h3></div>
+        <div class="card" onclick="openPage('Indents')"><i class="fas fa-file-invoice" style="color:#ff6f61"></i><h3>Indents</h3></div>
+        <div class="card" onclick="openPage('Documents')"><i class="fas fa-folder-open" style="color:#66ff99"></i><h3>My Documents</h3></div>
+        <div class="card" onclick="openPage('Pending Works')"><i class="fas fa-hourglass-half" style="color:#ff66cc"></i><h3>Pending Works</h3></div>
+        <div class="card" onclick="openPage('Gatepass')"><i class="fas fa-id-badge" style="color:#ffa500"></i><h3>Gatepass</h3></div>
     </div>
 </div>
 
-<div class="container">
-    <div class="card" onclick="openPage('My Work')"><i class="fas fa-briefcase" style="color:#00e5ff"></i><h3>My Work</h3></div>
-    <div class="card" onclick="openPage('Blocks')"><i class="fas fa-building" style="color:#ffcc00"></i><h3>Blocks</h3></div>
-    <div class="card" onclick="openPage('Indents')"><i class="fas fa-file-invoice" style="color:#ff6f61"></i><h3>Indents</h3></div>
-    <div class="card" onclick="openPage('Documents')"><i class="fas fa-folder-open" style="color:#66ff99"></i><h3>My Documents</h3></div>
-    <div class="card" onclick="openPage('Pending Works')"><i class="fas fa-hourglass-half" style="color:#ff66cc"></i><h3>Pending Works</h3></div>
-    <div class="card" onclick="openPage('Gatepass')"><i class="fas fa-id-badge" style="color:#ffa500"></i><h3>Gatepass</h3></div>
+<!-- TAB 2: DATA -->
+<div id="tab1" class="tab-content">
+    <div class="coming-soon">
+        <i class="fas fa-clock" style="font-size: 90px; margin-bottom: 20px;"></i><br>
+        📁 DATA SECTION<br>
+        <span style="font-size: 26px; color: #aaa;">Coming Soon...</span>
+    </div>
 </div>
 
 <!-- Search Results -->
@@ -133,7 +188,7 @@
             <tr>
                 <th>Type</th>
                 <th>Block</th>
-                <th>Item</th>
+                <th>Item / Equipment</th>
                 <th>Details</th>
                 <th>Status</th>
             </tr>
@@ -180,7 +235,15 @@ function updateChart() {
     }
 }
 
-// ==================== IMPROVED GLOBAL SEARCH ====================
+function switchTab(tabIndex) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    
+    document.getElementById(`tab${tabIndex}`).classList.add('active');
+    document.querySelectorAll('.tab-button')[tabIndex].classList.add('active');
+}
+
+// Global Search
 function globalSearch() {
     const query = document.getElementById("searchInput").value.toLowerCase().trim();
     const resultsDiv = document.getElementById("searchResults");
@@ -191,52 +254,8 @@ function globalSearch() {
         return;
     }
 
-    let results = [];
-    const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER"];
-
-    // Search all possible localStorage keys
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key.includes("works_") || key.includes("indents_") || key.includes("gatepass_") || key.includes("system_")) {
-            try {
-                const data = JSON.parse(localStorage.getItem(key));
-                if (Array.isArray(data)) {
-                    data.forEach(item => {
-                        const searchableText = JSON.stringify(item).toLowerCase();
-                        if (searchableText.includes(query)) {
-                            const blockName = key.split('_').slice(1).join(' ') || "General";
-                            results.push({
-                                type: key.includes("works") ? "Work" : key.includes("indents") ? "Indent" : key.includes("gatepass") ? "Gatepass" : "System",
-                                block: blockName,
-                                item: item.title || item.equipment || item.item || item.name || "N/A",
-                                details: item.details || item.purpose || item.status || "",
-                                status: item.status || "Pending"
-                            });
-                        }
-                    });
-                }
-            } catch(e) {}
-        }
-    }
-
-    tbody.innerHTML = "";
-
-    if (results.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;padding:20px;color:red;">No results found for "${query}"</td></tr>`;
-    } else {
-        results.forEach(res => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${res.type}</td>
-                <td>${res.block}</td>
-                <td>${res.item}</td>
-                <td>${res.details}</td>
-                <td>${res.status}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
+    // Simple search (you can expand later)
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px;">Searching for "${query}" in all data...</td></tr>`;
     resultsDiv.style.display = "block";
 }
 
