@@ -23,7 +23,7 @@
         justify-content: center;
         background: rgba(0,0,0,0.4);
         padding: 12px 0;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
     .tab-button {
         padding: 14px 35px;
@@ -48,33 +48,19 @@
 
     .search-container {
         text-align: center;
-        margin: 25px auto;
+        margin: 15px auto 25px;
         max-width: 700px;
     }
     #searchInput {
-        width: 90%;
-        max-width: 650px;
-        padding: 16px 20px;
-        font-size: 17px;
-        border: none;
-        border-radius: 50px;
-        background: rgba(255,255,255,0.95);
-        color: #333;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        width: 90%; max-width: 650px; padding: 16px 20px; font-size: 17px;
+        border: none; border-radius: 50px; background: rgba(255,255,255,0.95);
+        color: #333; box-shadow: 0 5px 20px rgba(0,0,0,0.3);
     }
     #searchInput:focus { outline: none; box-shadow: 0 8px 25px rgba(0,229,255,0.6); }
 
-    .chart-box {
-        width: 380px; margin: 25px auto; background: rgba(255,255,255,0.12);
-        padding: 25px; border-radius: 20px; backdrop-filter: blur(12px);
-    }
+    .chart-box { width: 380px; margin: 25px auto; background: rgba(255,255,255,0.12); padding: 25px; border-radius: 20px; backdrop-filter: blur(12px); }
     .system-row { display: flex; justify-content: center; margin: 30px 0 20px 0; }
-    .container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 25px;
-        padding: 20px 30px;
-    }
+    .container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 25px; padding: 20px 30px; }
     .card {
         background: rgba(255,255,255,0.15);
         border-radius: 18px;
@@ -117,17 +103,10 @@
     }
 
     .logout {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #e74c3c;
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-weight: bold;
-        z-index: 1000;
+        position: fixed; top: 20px; right: 20px;
+        background: #e74c3c; color: white; border: none;
+        padding: 12px 20px; border-radius: 8px; cursor: pointer;
+        font-weight: bold; z-index: 1000;
     }
     </style>
 </head>
@@ -137,6 +116,12 @@
 
 <button class="logout" onclick="logout()">🚪 Logout</button>
 
+<!-- Global Search -->
+<div class="search-container">
+    <input type="text" id="searchInput" placeholder="🔍 Search Equipment, Problem, Material, Person, IP, Serial No..." 
+           onkeyup="globalSearch()">
+</div>
+
 <!-- Tabs -->
 <div class="tabs">
     <button class="tab-button active" onclick="switchTab(0)">📊 All Blocks</button>
@@ -145,11 +130,6 @@
 
 <!-- TAB 1: ALL BLOCKS -->
 <div id="tab0" class="tab-content active">
-    <div class="search-container">
-        <input type="text" id="searchInput" placeholder="🔍 Search Equipment, Problem, Material, Person, IP, Serial No, Purpose..."
-               onkeyup="globalSearch()">
-    </div>
-
     <div class="chart-box">
         <canvas id="myChart"></canvas>
     </div>
@@ -174,9 +154,9 @@
 <!-- TAB 2: DATA -->
 <div id="tab1" class="tab-content">
     <div class="coming-soon">
-        <i class="fas fa-clock" style="font-size: 90px; margin-bottom: 20px;"></i><br>
+        <i class="fas fa-clock" style="font-size:90px;"></i><br><br>
         📁 DATA SECTION<br>
-        <span style="font-size: 26px; color: #aaa;">Coming Soon...</span>
+        <span style="font-size:24px;color:#ccc;">Coming Soon...</span>
     </div>
 </div>
 
@@ -187,10 +167,8 @@
         <thead>
             <tr>
                 <th>Type</th>
-                <th>Block</th>
-                <th>Item / Equipment</th>
-                <th>Details</th>
-                <th>Status</th>
+                <th>Key</th>
+                <th>Data</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -204,11 +182,11 @@ if(localStorage.getItem("loggedIn") !== "true") window.location.href = "index.ht
 let myChart;
 
 function updateChart() {
+    // Chart code (same as before)
     const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER"];
     let works=0, indents=0, gates=0, systems=0;
 
     works += (JSON.parse(localStorage.getItem("works")) || []).length;
-
     blocks.forEach(b => {
         const c = b.replace(/\s+/g, "_");
         works += (JSON.parse(localStorage.getItem("works_"+c)) || []).length;
@@ -219,31 +197,23 @@ function updateChart() {
 
     const chartData = {
         labels: ['Works', 'Indents', 'Gatepass', 'Systems'],
-        datasets: [{ 
-            data: [works, indents, gates, systems],
-            backgroundColor: ['#00e5ff','#ff6f61','#66ff99','#ffff00']
-        }]
+        datasets: [{ data: [works, indents, gates, systems], backgroundColor: ['#00e5ff','#ff6f61','#66ff99','#ffff00'] }]
     };
 
     if(myChart) myChart.update();
     else {
-        myChart = new Chart(document.getElementById('myChart'), {
-            type: 'doughnut',
-            data: chartData,
-            options: { responsive:true, plugins:{legend:{position:'bottom', labels:{color:'white'}}}}
-        });
+        myChart = new Chart(document.getElementById('myChart'), { type: 'doughnut', data: chartData, options: { responsive:true, plugins:{legend:{position:'bottom', labels:{color:'white'}}} } });
     }
 }
 
 function switchTab(tabIndex) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    
-    document.getElementById(`tab${tabIndex}`).classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab'+tabIndex).classList.add('active');
     document.querySelectorAll('.tab-button')[tabIndex].classList.add('active');
 }
 
-// Global Search
+// ==================== STRONG GLOBAL SEARCH ====================
 function globalSearch() {
     const query = document.getElementById("searchInput").value.toLowerCase().trim();
     const resultsDiv = document.getElementById("searchResults");
@@ -254,8 +224,29 @@ function globalSearch() {
         return;
     }
 
-    // Simple search (you can expand later)
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px;">Searching for "${query}" in all data...</td></tr>`;
+    tbody.innerHTML = "";
+    let found = false;
+
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key);
+
+        if (value && (key.toLowerCase().includes(query) || value.toLowerCase().includes(query))) {
+            found = true;
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>Stored Data</td>
+                <td>${key}</td>
+                <td style="max-width:600px; overflow-wrap:break-word;">${value.substring(0, 150)}...</td>
+            `;
+            tbody.appendChild(row);
+        }
+    }
+
+    if (!found) {
+        tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:30px; color:red;">No data found for "${query}"</td></tr>`;
+    }
+
     resultsDiv.style.display = "block";
 }
 
