@@ -4,28 +4,63 @@
     <title>Super Block Indent</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-    body { margin:0; font-family:Arial; background: linear-gradient(135deg, #1e3c72, #2a5298); color:white; }
-    header { text-align:center; padding:25px; font-size:26px; }
-    .container { padding:30px; max-width:900px; margin:auto; }
+    body { margin:0; font-family:Arial; background: linear-gradient(135deg, #6a11cb, #2575fc); color:white; }
+    header { text-align:center; padding:20px; font-size:26px; background:rgba(0,0,0,0.4); }
+    .back-btn, .logout { position:fixed; top:20px; padding:10px 18px; border:none; border-radius:8px; cursor:pointer; }
+    .back-btn { left:20px; background:#00bfff; color:white; }
+    .logout { right:20px; background:#e74c3c; color:white; }
+    .container { padding:80px 30px 30px; }
     .card { background:rgba(255,255,255,0.15); padding:25px; border-radius:15px; margin-bottom:20px; }
-    .logout { position:fixed; top:20px; right:20px; padding:10px 18px; background:#e74c3c; border:none; color:white; border-radius:8px; cursor:pointer; }
+    .edit-btn { background:#ffd700; color:black; padding:8px 15px; border:none; border-radius:5px; cursor:pointer; }
     </style>
 </head>
 <body>
-    <header>📄 Super Block Indent - Mr. Rafi</header>
+    <button class="back-btn" onclick="goBack()">← Back to Dashboard</button>
     <button class="logout" onclick="logout()">Logout</button>
 
-    <div class="container">
-        <div class="card">
-            <h3>New Indent Request</h3>
-            <p><strong>Item:</strong> Network Switch<br>
-               <strong>Quantity:</strong> 4<br>
-               <strong>Status:</strong> Approved</p>
-        </div>
-    </div>
+    <header>📄 Super Block Indent - Mr. Rafi</header>
+
+    <div class="container" id="indentContainer"></div>
 
     <script>
-    function logout(){ if(confirm("లాగ్ అవుట్ చేయాలా?")) window.location.href="index.html"; }
+    function loadIndentData() {
+        const container = document.getElementById('indentContainer');
+        let data = JSON.parse(localStorage.getItem('indents_SUPER_BLOCK') || '[]');
+        
+        if(data.length === 0) {
+            container.innerHTML = `<div class="card"><h3>No Indents Found for Super Block</h3></div>`;
+            return;
+        }
+
+        let html = '';
+        data.forEach((item, i) => {
+            html += `
+                <div class="card">
+                    <h3>${item.item || 'Indent Request'}</h3>
+                    <p><strong>Quantity:</strong> ${item.quantity || 'N/A'}</p>
+                    <p><strong>Status:</strong> ${item.status || 'Pending'}</p>
+                    <button class="edit-btn" onclick="editIndent(${i})">✏️ Edit Status</button>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function editIndent(index) {
+        let data = JSON.parse(localStorage.getItem('indents_SUPER_BLOCK') || '[]');
+        const newStatus = prompt("Update Status:", data[index].status);
+        if(newStatus) {
+            data[index].status = newStatus;
+            localStorage.setItem('indents_SUPER_BLOCK', JSON.stringify(data));
+            loadIndentData();
+        }
+    }
+
+    function goBack() { window.location.href = "dashboard.html"; }
+    function logout() {
+        if(confirm("లాగ్ అవుట్ చేయాలా?")) window.location.href = "index.html";
+    }
+
+    window.onload = loadIndentData;
     </script>
 </body>
 </html>
