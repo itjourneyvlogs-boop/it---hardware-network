@@ -53,6 +53,31 @@
         border: none; border-radius: 50px; background: rgba(255,255,255,0.95);
         color: #333;
     }
+
+    .search-results {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 20px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 15px;
+        display: none;
+    }
+    .search-results table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        color: black;
+    }
+    .search-results th {
+        background: #00bcd4;
+        color: white;
+        padding: 12px;
+    }
+    .search-results td {
+        padding: 10px;
+        border: 1px solid #ddd;
+    }
+
     .chart-box {
         width: 380px; margin: 25px auto; background: rgba(255,255,255,0.12);
         padding: 25px; border-radius: 20px; backdrop-filter: blur(12px);
@@ -86,7 +111,6 @@
         font-weight: bold;
         color: #ffd700;
     }
-
     .logout {
         position: fixed;
         top: 20px;
@@ -106,7 +130,6 @@
 
 <header>🚀 IT Work Management Dashboard</header>
 
-<!-- Logout Button -->
 <button class="logout" onclick="logout()">🚪 Logout</button>
 
 <!-- Tabs -->
@@ -115,7 +138,7 @@
     <button class="tab-button" onclick="switchTab(1)">📁 Data</button>
 </div>
 
-<!-- ==================== TAB 1: ALL BLOCKS ==================== -->
+<!-- TAB 1: ALL BLOCKS -->
 <div id="tab0" class="tab-content active">
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="🔍 Search Equipment, Problem, Material, Person, IP, Serial No..." onkeyup="globalSearch()">
@@ -142,13 +165,30 @@
     </div>
 </div>
 
-<!-- ==================== TAB 2: DATA (Coming Soon) ==================== -->
+<!-- TAB 2: DATA -->
 <div id="tab1" class="tab-content">
     <div class="coming-soon">
         <i class="fas fa-clock" style="font-size:80px; margin-bottom:20px;"></i><br>
         📁 Data Section<br>
         <span style="font-size:24px; color:#aaa;">Coming Soon...</span>
     </div>
+</div>
+
+<!-- Global Search Results -->
+<div class="search-results" id="searchResults">
+    <h3 style="color:white; text-align:center;">🔍 Search Results</h3>
+    <table id="searchTable">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Block</th>
+                <th>Item</th>
+                <th>Details</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
 </div>
 
 <script>
@@ -175,10 +215,7 @@ function updateChart() {
 
     const chartData = {
         labels: ['Works', 'Indents', 'Gatepass', 'Systems'],
-        datasets: [{
-            data: [works, indents, gates, systems],
-            backgroundColor: ['#00e5ff','#ff6f61','#66ff99','#ffff00']
-        }]
+        datasets: [{ data: [works, indents, gates, systems], backgroundColor: ['#00e5ff','#ff6f61','#66ff99','#ffff00'] }]
     };
 
     if(myChart) myChart.update();
@@ -186,18 +223,68 @@ function updateChart() {
         myChart = new Chart(document.getElementById('myChart'), {
             type: 'doughnut',
             data: chartData,
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
-            }
+            options: { responsive:true, plugins:{legend:{position:'bottom', labels:{color:'white'}}}}
         });
     }
+}
+
+// ==================== GLOBAL SEARCH ====================
+function globalSearch() {
+    const query = document.getElementById("searchInput").value.toLowerCase().trim();
+    const resultsDiv = document.getElementById("searchResults");
+    const tbody = document.querySelector("#searchTable tbody");
+
+    if (query.length < 2) {
+        resultsDiv.style.display = "none";
+        return;
+    }
+
+    let results = [];
+    const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER","SUPER_BLOCK"];
+
+    // Search in all stored data
+    blocks.forEach(block => {
+        const key = block === "SUPER_BLOCK" ? "works_SUPER_BLOCK" : "works_" + block.replace(/\s+/g, "_");
+        const data = JSON.parse(localStorage.getItem(key) || "[]");
+        
+        data.forEach(item => {
+            if (JSON.stringify(item).toLowerCase().includes(query)) {
+                results.push({
+                    type: "Work",
+                    block: block,
+                    item: item.title || item.equipment || "N/A",
+                    details: item.details || item.status || "",
+                    status: item.status || "Pending"
+                });
+            }
+        });
+    });
+
+    // Clear previous results
+    tbody.innerHTML = "";
+
+    if (results.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:20px;">No results found for "${query}"</td></tr>`;
+    } else {
+        results.forEach(res => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${res.type}</td>
+                <td>${res.block}</td>
+                <td>${res.item}</td>
+                <td>${res.details}</td>
+                <td>${res.status}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    resultsDiv.style.display = "block";
 }
 
 function switchTab(tabIndex) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-    
     document.getElementById(`tab${tabIndex}`).classList.add('active');
     document.querySelectorAll('.tab-button')[tabIndex].classList.add('active');
 }
@@ -221,8 +308,6 @@ function openPage(name) {
     };
     if (pages[name]) window.location.href = pages[name];
 }
-
-function globalSearch() { /* Search Logic */ }
 
 window.onload = () => {
     updateChart();
