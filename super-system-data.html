@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Super Block System Data</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+    body { margin:0; font-family:Arial; background: linear-gradient(135deg, #6a11cb, #2575fc); color:white; }
+    header { text-align:center; padding:25px; font-size:26px; }
+    .container { padding:30px; }
+    table { width:100%; border-collapse:collapse; background:rgba(255,255,255,0.1); }
+    th, td { padding:12px; border:1px solid rgba(255,255,255,0.3); text-align:left; }
+    th { background:rgba(0,0,0,0.4); }
+    .logout { position:fixed; top:20px; right:20px; padding:10px 18px; background:#e74c3c; border:none; color:white; border-radius:8px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <header>🖥️ Super Block System Data - Mr. Rafi</header>
+    <button class="logout" onclick="logout()">Logout</button>
+
+    <div class="container">
+        <table>
+            <tr><th>Serial No</th><th>Equipment</th><th>Block</th><th>IP Address</th><th>Status</th></tr>
+            <tr><td>SB-001</td><td>Server</td><td>Super Block</td><td>192.168.1.10</td><td style="color:lime;">Active</td></tr>
+            <tr><td>SB-002</td><td>Printer</td><td>Super Block</td><td>192.168.1.15</td><td style="color:orange;">Maintenance</td></tr>
+        </table>
+    </div>
+
+    <script>
+    function logout(){ if(confirm("లాగ్ అవుట్ చేయాలా?")) window.location.href="index.html"; }
+    </script>
+</body>
+</html>

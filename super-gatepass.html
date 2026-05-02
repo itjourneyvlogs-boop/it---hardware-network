@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Super Block Gate Pass</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+    body { margin:0; font-family:Arial; background: linear-gradient(135deg, #1e3c72, #2a5298); color:white; }
+    header { text-align:center; padding:25px; font-size:26px; }
+    .container { padding:30px; }
+    table { width:100%; border-collapse:collapse; background:rgba(255,255,255,0.1); }
+    th, td { padding:12px; border:1px solid rgba(255,255,255,0.3); }
+    .logout { position:fixed; top:20px; right:20px; padding:10px 18px; background:#e74c3c; border:none; color:white; border-radius:8px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <header>🏷️ Super Block Gate Pass - Mr. Rafi</header>
+    <button class="logout" onclick="logout()">Logout</button>
+
+    <div class="container">
+        <table>
+            <tr><th>Date</th><th>Person</th><th>Item</th><th>Purpose</th><th>Status</th></tr>
+            <tr><td>02-05-2026</td><td>Rafi</td><td>Laptop</td><td>Official Work</td><td style="color:lime;">Approved</td></tr>
+        </table>
+    </div>
+
+    <script>
+    function logout(){ if(confirm("లాగ్ అవుట్ చేయాలా?")) window.location.href="index.html"; }
+    </script>
+</body>
+</html>

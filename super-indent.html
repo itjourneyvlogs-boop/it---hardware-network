@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Super Block Indent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+    body { margin:0; font-family:Arial; background: linear-gradient(135deg, #1e3c72, #2a5298); color:white; }
+    header { text-align:center; padding:25px; font-size:26px; }
+    .container { padding:30px; max-width:900px; margin:auto; }
+    .card { background:rgba(255,255,255,0.15); padding:25px; border-radius:15px; margin-bottom:20px; }
+    .logout { position:fixed; top:20px; right:20px; padding:10px 18px; background:#e74c3c; border:none; color:white; border-radius:8px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <header>📄 Super Block Indent - Mr. Rafi</header>
+    <button class="logout" onclick="logout()">Logout</button>
+
+    <div class="container">
+        <div class="card">
+            <h3>New Indent Request</h3>
+            <p><strong>Item:</strong> Network Switch<br>
+               <strong>Quantity:</strong> 4<br>
+               <strong>Status:</strong> Approved</p>
+        </div>
+    </div>
+
+    <script>
+    function logout(){ if(confirm("లాగ్ అవుట్ చేయాలా?")) window.location.href="index.html"; }
+    </script>
+</body>
+</html>

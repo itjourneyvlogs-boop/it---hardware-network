@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mr. Rafi - My Work</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+    body { margin:0; font-family:Arial; background: linear-gradient(135deg, #6a11cb, #2575fc); color:white; }
+    header { text-align:center; padding:25px; font-size:26px; background:rgba(0,0,0,0.4); }
+    .container { padding:30px; display:grid; grid-template-columns:repeat(auto-fit, minmax(300px,1fr)); gap:20px; }
+    .card { background:rgba(255,255,255,0.15); padding:25px; border-radius:15px; }
+    .logout { position:fixed; top:20px; right:20px; padding:12px 20px; background:#e74c3c; border:none; color:white; border-radius:8px; cursor:pointer; }
+    </style>
+</head>
+<body>
+    <header>👤 Mr. Rafi - My Work (Super Block)</header>
+    <button class="logout" onclick="logout()">Logout</button>
+
+    <div class="container" id="workContainer">
+        <!-- JavaScript ద్వారా డేటా వస్తుంది -->
+    </div>
+
+    <script>
+    function loadSuperBlockWorks() {
+        const container = document.getElementById('workContainer');
+        const data = JSON.parse(localStorage.getItem('works_SUPER_BLOCK') || '[]');
+        
+        if(data.length === 0) {
+            container.innerHTML = "<div class='card'><h3>No Works Found for Super Block</h3></div>";
+            return;
+        }
+
+        let html = '';
+        data.forEach(item => {
+            html += `
+                <div class="card">
+                    <h3>${item.title || 'Work'}</h3>
+                    <p><strong>Date:</strong> ${item.date || 'N/A'}</p>
+                    <p><strong>Status:</strong> ${item.status || 'Pending'}</p>
+                </div>`;
+        });
+        container.innerHTML = html;
+    }
+
+    function logout(){ 
+        if(confirm("లాగ్ అవుట్ చేయాలా?")) {
+            localStorage.removeItem("loggedIn");
+            window.location.href="index.html";
+        }
+    }
+
+    window.onload = loadSuperBlockWorks;
+    </script>
+</body>
+</html>
