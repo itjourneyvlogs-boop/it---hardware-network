@@ -82,6 +82,10 @@
     }
     @keyframes glow { from {box-shadow: 0 0 20px rgba(255,51,153,0.7);} to {box-shadow: 0 0 45px rgba(255,51,153,1);} }
 
+    .rafi-card {
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+    }
+
     .logout {
         position: fixed; top: 20px; right: 20px;
         background: #e74c3c; color: white; border: none;
@@ -94,7 +98,6 @@
 
 <header>🚀 IT Work Management Dashboard</header>
 
-<!-- Logout -->
 <button class="logout" onclick="logout()">🚪 Logout</button>
 
 <!-- Tabs -->
@@ -132,14 +135,34 @@
 
 <!-- Tab 2: Mr. Rafi Data -->
 <div id="tab1" class="tab-content">
-    <div style="text-align:center; padding: 60px 20px;">
-        <h1><i class="fas fa-user-secret" style="font-size: 80px; color:#ffd700;"></i></h1>
-        <h2>Mr. Rafi Data Dashboard</h2>
-        <p style="font-size:18px; margin:30px 0;">This section will contain Mr. Rafi's specific data, reports, and records.</p>
+    <div class="search-container">
+        <input type="text" id="searchInputRafi" placeholder="🔍 Search in Mr. Rafi Data..." onkeyup="globalSearchRafi()">
+    </div>
+
+    <div class="container">
+        <div class="card rafi-card" onclick="openPage('Rafi My Work')">
+            <i class="fas fa-briefcase" style="color:#ffd700; font-size:52px;"></i>
+            <h3>My Work</h3>
+        </div>
         
-        <!-- ఇక్కడ మీరు కావాల్సిన కంటెంట్ తర్వాత జోడించవచ్చు -->
-        <div class="card" style="max-width:400px; margin:30px auto; display:inline-block;">
-            <h3>Coming Soon / Customize Here</h3>
+        <div class="card rafi-card" onclick="openPage('Super Block System Data')">
+            <i class="fas fa-server" style="color:#00ffcc; font-size:52px;"></i>
+            <h3>Super Block System Data</h3>
+        </div>
+        
+        <div class="card rafi-card" onclick="openPage('Super Block Indent')">
+            <i class="fas fa-file-invoice" style="color:#ff6f61; font-size:52px;"></i>
+            <h3>Super Block Indent</h3>
+        </div>
+        
+        <div class="card rafi-card" onclick="openPage('Super Block Gate Pass')">
+            <i class="fas fa-id-badge" style="color:#ffa500; font-size:52px;"></i>
+            <h3>Super Block Gate Pass</h3>
+        </div>
+        
+        <div class="card rafi-card" onclick="openPage('Rafi Documents')">
+            <i class="fas fa-folder-open" style="color:#66ff99; font-size:52px;"></i>
+            <h3>Documents</h3>
         </div>
     </div>
 </div>
@@ -151,11 +174,11 @@ if(localStorage.getItem("loggedIn") !== "true") window.location.href = "index.ht
 let myChart;
 
 function updateChart() {
+    // Existing chart logic (All Blocks)
     const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER"];
     let works=0, indents=0, gates=0, systems=0;
 
     works += (JSON.parse(localStorage.getItem("works")) || []).length;
-
     blocks.forEach(b => {
         const c = b.replace(/\s+/g, "_");
         works += (JSON.parse(localStorage.getItem("works_"+c)) || []).length;
@@ -205,10 +228,21 @@ function openPage(name) {
         "Documents": "my-documents.html",
         "Pending Works": "view.html",
         "Gatepass": "gatepass.html",
-        "System Data": "system-data.html"
+        "System Data": "system-data.html",
+        
+        // Rafi Pages
+        "Rafi My Work": "rafi-mywork.html",
+        "Super Block System Data": "super-system-data.html",
+        "Super Block Indent": "super-indent.html",
+        "Super Block Gate Pass": "super-gatepass.html",
+        "Rafi Documents": "rafi-documents.html"
     };
     if (pages[name]) window.location.href = pages[name];
 }
+
+// Placeholder search functions
+function globalSearch() { /* All Blocks search */ }
+function globalSearchRafi() { /* Rafi Data search */ }
 
 window.onload = () => {
     updateChart();
