@@ -1,38 +1,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard</title>
+    <title>IT Work Management Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
     body {
         margin: 0;
-        font-family: Arial;
+        font-family: Arial, sans-serif;
         background: linear-gradient(135deg, #1e3c72, #2a5298);
         color: white;
+        min-height: 100vh;
     }
     header { 
         text-align: center; 
-        padding: 20px; 
+        padding: 25px; 
         font-size: 28px; 
         font-weight: bold; 
+        background: rgba(0,0,0,0.3);
     }
 
     .tabs {
         display: flex;
         justify-content: center;
-        background: rgba(0,0,0,0.3);
-        padding: 10px 0;
+        background: rgba(0,0,0,0.4);
+        padding: 12px 0;
         margin-bottom: 20px;
+        flex-wrap: wrap;
     }
     .tab-button {
-        padding: 15px 40px;
+        padding: 14px 35px;
         font-size: 18px;
         font-weight: bold;
         border: none;
         background: rgba(255,255,255,0.1);
         color: white;
-        margin: 0 10px;
+        margin: 5px 10px;
         border-radius: 50px;
         cursor: pointer;
         transition: all 0.3s;
@@ -40,25 +43,24 @@
     .tab-button.active {
         background: #00e5ff;
         color: #1e3c72;
-        box-shadow: 0 5px 15px rgba(0,229,255,0.6);
+        box-shadow: 0 5px 20px rgba(0,229,255,0.5);
     }
 
-    .tab-content {
-        display: none;
-        padding: 20px;
-    }
-    .tab-content.active {
-        display: block;
-    }
+    .tab-content { display: none; padding: 10px 20px; }
+    .tab-content.active { display: block; }
 
     .search-container { text-align: center; margin: 20px auto; max-width: 700px; }
-    #searchInput {
+    #searchInput, #searchInputRafi {
         width: 90%; max-width: 650px; padding: 16px 20px; font-size: 17px;
         border: none; border-radius: 50px; background: rgba(255,255,255,0.95);
         color: #333;
     }
 
-    .chart-box { width: 380px; margin: 25px auto; background: rgba(255,255,255,0.12); padding: 25px; border-radius: 20px; backdrop-filter: blur(12px); }
+    .chart-box {
+        width: 380px; margin: 25px auto; background: rgba(255,255,255,0.12);
+        padding: 25px; border-radius: 20px; backdrop-filter: blur(12px);
+    }
+
     .container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -68,12 +70,12 @@
     .card {
         background: rgba(255,255,255,0.15);
         border-radius: 18px;
-        padding: 30px 20px;
+        padding: 25px 20px;
         text-align: center;
         cursor: pointer;
         transition: all 0.4s;
     }
-    .card:hover { transform: translateY(-12px) scale(1.08); background: rgba(255,255,255,0.25); }
+    .card:hover { transform: translateY(-10px) scale(1.05); background: rgba(255,255,255,0.25); }
 
     .system-card {
         background: linear-gradient(135deg, #ff0066, #ff3399);
@@ -87,10 +89,17 @@
     }
 
     .logout {
-        position: fixed; top: 20px; right: 20px;
-        background: #e74c3c; color: white; border: none;
-        padding: 12px 20px; border-radius: 8px; cursor: pointer;
-        font-weight: bold; z-index: 1000;
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+        z-index: 1000;
     }
     </style>
 </head>
@@ -98,6 +107,7 @@
 
 <header>🚀 IT Work Management Dashboard</header>
 
+<!-- Logout Button -->
 <button class="logout" onclick="logout()">🚪 Logout</button>
 
 <!-- Tabs -->
@@ -106,7 +116,7 @@
     <button class="tab-button" onclick="switchTab(1)">👤 Mr. Rafi Data</button>
 </div>
 
-<!-- Tab 1: All Blocks -->
+<!-- ==================== TAB 1: ALL BLOCKS ==================== -->
 <div id="tab0" class="tab-content active">
     <div class="search-container">
         <input type="text" id="searchInput" placeholder="🔍 Search Equipment, Problem, Material, Person, IP, Serial No..." onkeyup="globalSearch()">
@@ -116,9 +126,9 @@
         <canvas id="myChart"></canvas>
     </div>
 
-    <div class="system-row">
-        <div class="card system-card" onclick="openPage('System Data')">
-            <i class="fas fa-server" style="color: #ffff00; font-size: 58px;"></i>
+    <div style="text-align:center; margin:20px;">
+        <div class="card system-card" style="display:inline-block; width:300px;" onclick="openPage('System Data')">
+            <i class="fas fa-server" style="color: #ffff00; font-size: 55px;"></i>
             <h3>System Data</h3>
         </div>
     </div>
@@ -127,41 +137,37 @@
         <div class="card" onclick="openPage('My Work')"><i class="fas fa-briefcase" style="color:#00e5ff"></i><h3>My Work</h3></div>
         <div class="card" onclick="openPage('Blocks')"><i class="fas fa-building" style="color:#ffcc00"></i><h3>Blocks</h3></div>
         <div class="card" onclick="openPage('Indents')"><i class="fas fa-file-invoice" style="color:#ff6f61"></i><h3>Indents</h3></div>
-        <div class="card" onclick="openPage('Documents')"><i class="fas fa-folder-open" style="color:#66ff99"></i><h3>My Documents</h3></div>
+        <div class="card" onclick="openPage('Documents')"><i class="fas fa-folder-open" style="color:#66ff99"></i><h3>Documents</h3></div>
         <div class="card" onclick="openPage('Pending Works')"><i class="fas fa-hourglass-half" style="color:#ff66cc"></i><h3>Pending Works</h3></div>
         <div class="card" onclick="openPage('Gatepass')"><i class="fas fa-id-badge" style="color:#ffa500"></i><h3>Gatepass</h3></div>
     </div>
 </div>
 
-<!-- Tab 2: Mr. Rafi Data -->
+<!-- ==================== TAB 2: MR. RAFI DATA ==================== -->
 <div id="tab1" class="tab-content">
     <div class="search-container">
-        <input type="text" id="searchInputRafi" placeholder="🔍 Search in Mr. Rafi Data..." onkeyup="globalSearchRafi()">
+        <input type="text" id="searchInputRafi" placeholder="🔍 Search in Mr. Rafi Data (Super Block)..." onkeyup="globalSearchRafi()">
     </div>
 
     <div class="container">
         <div class="card rafi-card" onclick="openPage('Rafi My Work')">
-            <i class="fas fa-briefcase" style="color:#ffd700; font-size:52px;"></i>
+            <i class="fas fa-briefcase" style="color:#ffd700; font-size:55px;"></i>
             <h3>My Work</h3>
         </div>
-        
         <div class="card rafi-card" onclick="openPage('Super Block System Data')">
-            <i class="fas fa-server" style="color:#00ffcc; font-size:52px;"></i>
+            <i class="fas fa-server" style="color:#00ffcc; font-size:55px;"></i>
             <h3>Super Block System Data</h3>
         </div>
-        
         <div class="card rafi-card" onclick="openPage('Super Block Indent')">
-            <i class="fas fa-file-invoice" style="color:#ff6f61; font-size:52px;"></i>
+            <i class="fas fa-file-invoice" style="color:#ff6f61; font-size:55px;"></i>
             <h3>Super Block Indent</h3>
         </div>
-        
         <div class="card rafi-card" onclick="openPage('Super Block Gate Pass')">
-            <i class="fas fa-id-badge" style="color:#ffa500; font-size:52px;"></i>
+            <i class="fas fa-id-badge" style="color:#ffa500; font-size:55px;"></i>
             <h3>Super Block Gate Pass</h3>
         </div>
-        
         <div class="card rafi-card" onclick="openPage('Rafi Documents')">
-            <i class="fas fa-folder-open" style="color:#66ff99; font-size:52px;"></i>
+            <i class="fas fa-folder-open" style="color:#66ff99; font-size:55px;"></i>
             <h3>Documents</h3>
         </div>
     </div>
@@ -169,16 +175,18 @@
 
 <script>
 // Login Check
-if(localStorage.getItem("loggedIn") !== "true") window.location.href = "index.html";
+if(localStorage.getItem("loggedIn") !== "true") {
+    window.location.href = "index.html";
+}
 
 let myChart;
 
 function updateChart() {
-    // Existing chart logic (All Blocks)
     const blocks = ["NGH","NSSH","NNC","OPD BLOCK","NMC","NDC","NPC","CAMP OFFICE","SITE OFFICE","BOYS HOSTEL","GIRLS HOSTEL","OTHER"];
     let works=0, indents=0, gates=0, systems=0;
 
     works += (JSON.parse(localStorage.getItem("works")) || []).length;
+
     blocks.forEach(b => {
         const c = b.replace(/\s+/g, "_");
         works += (JSON.parse(localStorage.getItem("works_"+c)) || []).length;
@@ -200,7 +208,10 @@ function updateChart() {
         myChart = new Chart(document.getElementById('myChart'), {
             type: 'doughnut',
             data: chartData,
-            options: { responsive:true, plugins:{legend:{position:'bottom', labels:{color:'white'}}}}
+            options: { 
+                responsive: true, 
+                plugins: { legend: { position: 'bottom', labels: { color: 'white' } } }
+            }
         });
     }
 }
@@ -240,9 +251,9 @@ function openPage(name) {
     if (pages[name]) window.location.href = pages[name];
 }
 
-// Placeholder search functions
-function globalSearch() { /* All Blocks search */ }
-function globalSearchRafi() { /* Rafi Data search */ }
+// Placeholder Search Functions
+function globalSearch() { /* All Blocks Search Logic */ }
+function globalSearchRafi() { /* Rafi Search Logic */ }
 
 window.onload = () => {
     updateChart();
